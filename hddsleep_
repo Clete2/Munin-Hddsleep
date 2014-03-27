@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+=head1 NAME
+hddsleep_ - Munin plugin to display the active/sleep state of a drive. Useful for non-solid state drives to determine if they are spinning.
+
+=head1 CONFIGURATION
+ln -s /usr/libexec/munin/plugins/hddsleep_ /etc/munin/plugins/hddsleep_sdx
+
+If the above is sda, the script will run hdparm -C /dev/sda.
+
+This script should run as a user privileged to run hdparm -C on the specified drive. Configure this as normal.
+
+=cut
+
+use File::Basename;
+
+if(basename $0 =~ /hddsleep_(\w{3})/){
+	$drive = $1;
+}else{
+	die("Please name hddsleep_sdx");
+}
+
+if($ARGV[0] eq "config"){
+	print "graph_title Hard Drive Spinning State\n";
+	print "graph_vlabel Spinning\n";
+	print "graph_category disk\n";
+	print "graph_args -l 0 -u 1\n";
+	print "$drive.label $drive\n";
+	exit;
+}
+
+chomp(@hdparm = `hdparm -C /dev/$drive`);
+
+foreach (@hdparm){
+	if(/.*?drive\sstate\sis:\s*(.*)/i){ 
+		if($1 =~ /active/i){
+			print "$drive.value 1.00\n";
+		}else{
+			print "$drive.value 0.00\n";
+		}
+	}
+}
