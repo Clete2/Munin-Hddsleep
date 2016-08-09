@@ -20,7 +20,7 @@ if(basename $0 =~ /hddsleep_(\w{3})/){
 }
 
 if($ARGV[0] eq "config"){
-	print "graph_title Hard Drive Spinning State\n";
+	print "graph_title Hard Drive Spinning State for drive $drive\n";
 	print "graph_vlabel Spinning\n";
 	print "graph_category disk\n";
 	print "graph_args -l 0 -u 1\n";
